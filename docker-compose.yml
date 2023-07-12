@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./tmp/db:/var/lib/mysql
+  app:
+    build: docker/app
+    tty: true
+    volumes:
+      - ./api:/api
+      - ~/.ssh:/root/.ssh
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ap-northeast-1
+
+  web:
+    build: docker/web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/var/www/html
+    tty: true
